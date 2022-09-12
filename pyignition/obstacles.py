@@ -3,7 +3,15 @@
 # 
 # Obstacle objects
 
-import pygame
+
+#### THIS FILE IS CURRENTLY UNUSED. POSSIBLE FUTURE. ####
+
+
+# This file is currently unused by Ren'Py due
+# to having no draw functions for shapes.
+
+# import pygame
+
 from math import sqrt, pow
 from gravity import UNIVERSAL_CONSTANT_OF_MAKE_GRAVITY_LESS_STUPIDLY_SMALL
 import keyframes, interpolate
@@ -98,67 +106,67 @@ class Obstacle:
 
 
 class Circle(Obstacle):
-	def __init__(self, pos, colour, bounce, radius):
-		Obstacle.__init__(self, pos, colour, bounce)
-		self.radius = radius
-		self.radiussquared = self.radius ** 2
-		self.maxdist = MAXDIST + self.radius
-		self.CreateKeyframe(0, self.pos, self.colour, self.bounce, self.radius)
+    def __init__(self, pos, colour, bounce, radius):
+        Obstacle.__init__(self, pos, colour, bounce)
+        self.radius = radius
+        self.radiussquared = self.radius ** 2
+        self.maxdist = MAXDIST + self.radius
+        self.CreateKeyframe(0, self.pos, self.colour, self.bounce, self.radius)
 	
-	def Draw(self, display):
-		pygame.draw.circle(display, self.colour, self.pos, self.radius)
+    def Draw(self, display):
+        pygame.draw.circle(display, self.colour, self.pos, self.radius)
+
+    def Update(self):
+        newvars = interpolate.InterpolateKeyframes(self.curframe, {'pos_x':self.pos[0], 'pos_y':self.pos[1], 'colour_r':self.colour[0], 'colour_g':self.colour[1], 'colour_b':self.colour[2], 'bounce':self.bounce, 'radius':self.radius}, self.keyframes)
+        self.pos = (newvars['pos_x'], newvars['pos_y'])
+        self.colour = (newvars['colour_r'], newvars['colour_g'], newvars['colour_b'])
+        self.bounce = newvars['bounce']
+        self.radius = newvars['radius']
+
+        Obstacle.Update(self)
 	
-	def Update(self):
-		newvars = interpolate.InterpolateKeyframes(self.curframe, {'pos_x':self.pos[0], 'pos_y':self.pos[1], 'colour_r':self.colour[0], 'colour_g':self.colour[1], 'colour_b':self.colour[2], 'bounce':self.bounce, 'radius':self.radius}, self.keyframes)
-		self.pos = (newvars['pos_x'], newvars['pos_y'])
-		self.colour = (newvars['colour_r'], newvars['colour_g'], newvars['colour_b'])
-		self.bounce = newvars['bounce']
-		self.radius = newvars['radius']
-		
-		Obstacle.Update(self)
+    def InsideObject(self, pos):
+        return (magnitudesquared([pos[0] - self.pos[0], pos[1] - self.pos[1]]) < self.radiussquared)
 	
-	def InsideObject(self, pos):
-		return (magnitudesquared([pos[0] - self.pos[0], pos[1] - self.pos[1]]) < self.radiussquared)
+    def GetResolved(self, pos):
+        if pos == self.pos:  # If the position is at this obstacle's origin, shift it up a pixel to avoid divide-by-zero errors
+            return self.GetResolved([pos[0], pos[1] - 1])
+
+            vec = [pos[0] - self.pos[0], pos[1] - self.pos[1]]
+            mag = magnitude(vec)
+            nor = [vec[0] / mag, vec[1] / mag]
+            correctedvec = [nor[0] * self.radius, nor[1] * self.radius]
+
+            return [self.pos[0] + correctedvec[0], self.pos[1] + correctedvec[1]]
 	
-	def GetResolved(self, pos):
-		if pos == self.pos:  # If the position is at this obstacle's origin, shift it up a pixel to avoid divide-by-zero errors
-			return self.GetResolved([pos[0], pos[1] - 1])
-			
-		vec = [pos[0] - self.pos[0], pos[1] - self.pos[1]]
-		mag = magnitude(vec)
-		nor = [vec[0] / mag, vec[1] / mag]
-		correctedvec = [nor[0] * self.radius, nor[1] * self.radius]
-		
-		return [self.pos[0] + correctedvec[0], self.pos[1] + correctedvec[1]]
+    def GetNormal(self, pos):
+        vec = [pos[0] - self.pos[0], pos[1] - self.pos[1]]
+        mag = magnitude(vec)
+
+        return [vec[0] / mag, vec[1] / mag]
 	
-	def GetNormal(self, pos):
-		vec = [pos[0] - self.pos[0], pos[1] - self.pos[1]]
-		mag = magnitude(vec)
-		
-		return [vec[0] / mag, vec[1] / mag]
+    def GetForceFactor(self, pos):		
+        nvec = self.GetNormal(pos)
+        tempradius = self.radius
+        vec = [tempradius * nvec[0], tempradius * nvec[1]]
+        newpos = [pos[0] - vec[0], pos[1] - vec[1]]
+
+        distcubed = (abs(pow(float(newpos[0] - self.pos[0]), 3.0)) + abs(pow(float(newpos[1] - self.pos[1]), 3.0)))
+        if distcubed <= 1.0:
+            return 1.0
+
+        force = (1.0 / distcubed)
+
+        return force
 	
-	def GetForceFactor(self, pos):		
-		nvec = self.GetNormal(pos)
-		tempradius = self.radius
-		vec = [tempradius * nvec[0], tempradius * nvec[1]]
-		newpos = [pos[0] - vec[0], pos[1] - vec[1]]
-		
-		distcubed = (abs(pow(float(newpos[0] - self.pos[0]), 3.0)) + abs(pow(float(newpos[1] - self.pos[1]), 3.0)))
-		if distcubed <= 1.0:
-			return 1.0
-		
-		force = (1.0 / distcubed)
-		
-		return force
+    def CreateKeyframe(self, frame, pos = (None, None), colour = (None, None, None), bounce = None, radius = None, interpolationtype = "linear"):
+        keyframes.CreateKeyframe(self.keyframes, frame, {'pos_x':pos[0], 'pos_y':pos[1], 'colour_r':colour[0], 'colour_g':colour[1], 'colour_b':colour[2], 'bounce':bounce, 'radius':radius, 'interpolationtype':interpolationtype})
 	
-	def CreateKeyframe(self, frame, pos = (None, None), colour = (None, None, None), bounce = None, radius = None, interpolationtype = "linear"):
-		keyframes.CreateKeyframe(self.keyframes, frame, {'pos_x':pos[0], 'pos_y':pos[1], 'colour_r':colour[0], 'colour_g':colour[1], 'colour_b':colour[2], 'bounce':bounce, 'radius':radius, 'interpolationtype':interpolationtype})
+    def ConsolidateKeyframes(self):
+        keyframes.ConsolidateKeyframes(self.keyframes, self.curframe, {'pos_x':self.pos[0], 'pos_y':self.pos[1], 'colour_r':self.colour[0], 'colour_g':self.colour[1], 'colour_b':self.colour[2], 'bounce':self.bounce, 'radius':self.radius})
 	
-	def ConsolidateKeyframes(self):
-		keyframes.ConsolidateKeyframes(self.keyframes, self.curframe, {'pos_x':self.pos[0], 'pos_y':self.pos[1], 'colour_r':self.colour[0], 'colour_g':self.colour[1], 'colour_b':self.colour[2], 'bounce':self.bounce, 'radius':self.radius})
-	
-	def SetRadius(self, newradius):
-		self.CreateKeyframe(self.curframe, radius = newradius)
+    def SetRadius(self, newradius):
+        self.CreateKeyframe(self.curframe, radius = newradius)
 
 
 class Rectangle(Obstacle):

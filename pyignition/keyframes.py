@@ -9,7 +9,11 @@ def CreateKeyframe(parentframes, frame, variables):
 	
 	# Look for duplicate keyframes and copy other defined variables
 	try:
+
+        # Updated to work with Python 3 (.next() -> next()). Not sure if it works the same. #
 		oldkey = next(keyframe for keyframe in parentframes if keyframe.frame == frame)
+        ####
+
 	except StopIteration:
 		oldkey = None
 	

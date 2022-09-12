@@ -4,7 +4,6 @@
 # Particle effect manager
 
 import particles, gravity
-# import particles, gravity, obstacles, sys
 
 DRAWTYPE_IMAGE = particles.DRAWTYPE_IMAGE
 
@@ -22,7 +21,6 @@ class ParticleEffect:
 		self.particles = []
 		self.sources = []
 		self.gravities = []
-		self.obstacles = []
 	
 	def Update(self):
 		for source in self.sources:
@@ -30,23 +28,12 @@ class ParticleEffect:
 		
 		for gravity in self.gravities:
 			gravity.Update()
-		
-		for obstacle in self.obstacles:
-			obstacle.Update()
 
 		for particle in self.particles:
 			totalforce = [0.0, 0.0]
 			
 			for gravity in self.gravities:
 				force = gravity.GetForce(particle.pos)
-				totalforce[0] += force[0]
-				totalforce[1] += force[1]
-			
-			for obstacle in self.obstacles:
-				if (not obstacle.OutOfRange(particle.pos)) and (obstacle.InsideObject(particle.pos)):
-					particle.pos = obstacle.GetResolved(particle.pos)
-				
-				force = obstacle.GetForce(particle.pos, particle.velocity)
 				totalforce[0] += force[0]
 				totalforce[1] += force[1]
 			
@@ -62,9 +49,6 @@ class ParticleEffect:
 	def Redraw(self):
 		for particle in self.particles:
 			particle.Draw(self.display)
-			
-		for obstacle in self.obstacles:
-			obstacle.Draw(self.display)
 	
 	def CreateSource(self, pos = (0, 0), initspeed = 0.0, initdirection = 0.0, initspeedrandrange = 0.0, initdirectionrandrange = 0.0, particlesperframe = 0, particlelife = 0, genspacing = 0, drawtype = 0, colour = (0, 0, 0), radius = 0.0, length = 0.0, image = None):
 		newsource = particles.ParticleSource(self, pos, initspeed, initdirection, initspeedrandrange, initdirectionrandrange, particlesperframe, particlelife, genspacing, drawtype, colour, radius, length, image)

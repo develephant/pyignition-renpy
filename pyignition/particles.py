@@ -6,16 +6,7 @@
 
 import keyframes, interpolate, random, math
 
-#########################################################################
-# DRAWTYPE_POINT = 0
-# DRAWTYPE_CIRCLE = 1
-# DRAWTYPE_LINE = 2
-# DRAWTYPE_SCALELINE = 3
-# DRAWTYPE_BUBBLE = 4
-#########################################################################
-
-DRAWTYPE_IMAGE = 5
-
+DRAWTYPE_IMAGE = 1 #renpy only supports images for particles
 
 class Particle:
     def __init__(self, parent, initpos, velocity, life, drawtype = 5, colour = (0, 0, 0), radius = 0.0, length = 0.0, image = None, keyframes = []):
@@ -41,7 +32,10 @@ class Particle:
         if self.curframe > self.life:
             self.alive = False
         else:
+            # Not sure if renpy can handle color changes #
             self.colour = (self.parent.particlecache[self.curframe]['colour_r'], self.parent.particlecache[self.curframe]['colour_g'], self.parent.particlecache[self.curframe]['colour_b'])
+            ####
+
             self.radius = self.parent.particlecache[self.curframe]['radius']
             self.length = self.parent.particlecache[self.curframe]['length']
             self.curframe = self.curframe + 1
@@ -52,12 +46,11 @@ class Particle:
 		
         if self.drawtype == DRAWTYPE_IMAGE:  # Image (default)
             print("draw")
-            ##### CONVERT
-            size = (100, 100)
-			# size = self.image.get_size()
-			# display.blit(self.image, (self.pos[0] - size[1], self.pos[1] - size[1]))
-            #####
 
+            # Convert this to renpy code? #
+            size = self.image.get_size()
+            display.blit(self.image, (self.pos[0] - size[1], self.pos[1] - size[1]))
+            ####
 
     def CreateKeyframe(self, frame, colour = (None, None, None), radius = None, length = None):
         keyframes.CreateKeyframe(self.keyframes, frame, {'colour_r':colour[0], 'colour_g':colour[1], 'colour_b':colour[2], 'radius':radius, 'length':length})

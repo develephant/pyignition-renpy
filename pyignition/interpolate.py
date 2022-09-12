@@ -47,11 +47,14 @@ def InterpolateKeyframes(curframe, variables, keyframes):
 	
 	keys = variables.keys()
 	
+    # Updated for Python 3 (xrange -> range). Not sure if it works the same #
 	for i in range(len(keys)):  # Determine current keyframe and next one for this variable
+
 		key = keys[i]
 		curkeyframe = None
 		nextkeyframe = None
 		
+        # Updated for Python 3 (xrange -> range). Not sure if it works the same #
 		for i in range(len(keyframes)):
 			try:
 				frame = keyframes[i]
