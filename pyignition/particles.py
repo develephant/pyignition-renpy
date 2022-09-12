@@ -19,7 +19,7 @@ class Particle:
         self.radius = radius
         self.length = length
         self.image = image
-        self.drawtype = 5
+        self.drawtype = 5 # FORCING IMAGE TYPE (refactor)
         self.keyframes = []
         self.keyframes.extend(keyframes[:])
         self.curframe = 0

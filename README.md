@@ -44,6 +44,8 @@ __NOTE:__ _The `obstacles.py` is not being used at this time due to some `pygame
 
 # Resources
 
+__More notes and links are in the Github issues.__
+
 [PyIgnition](https://launchpad.net/pyignition)
 
 [Ren'Py Sprites Docs](https://www.renpy.org/doc/html/sprites.html)
