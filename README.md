@@ -44,7 +44,7 @@ __NOTE:__ _The `obstacles.py` is not being used at this time due to some `pygame
 
 # Resources
 
-__More notes and links are in the Github issues.__
+__More notes and links are in the Github [issues](https://github.com/develephant/pyignition-renpy/issues).__
 
 [PyIgnition](https://launchpad.net/pyignition)
 
